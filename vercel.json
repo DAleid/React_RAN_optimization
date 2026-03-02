@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "api/intent.py": {
+      "maxDuration": 300,
+      "memory": 2048
+    }
+  },
+  "rewrites": [
+    { "source": "/api/intent", "destination": "/api/intent.py" }
+  ]
+}
