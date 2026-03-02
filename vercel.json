@@ -1,11 +1,5 @@
 {
-  "functions": {
-    "api/intent.py": {
-      "maxDuration": 300,
-      "memory": 2048
-    }
-  },
-  "rewrites": [
-    { "source": "/api/intent", "destination": "/api/intent.py" }
-  ]
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs"
 }
