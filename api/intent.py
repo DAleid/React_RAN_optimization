@@ -1,5 +1,5 @@
 """
-Intent Processing API — Vercel Python Serverless Function
+Intent Processing API — Flask backend (Railway / Render / local)
 POST /api/intent  →  Runs CrewAI agents to parse and plan 5G network intent
 """
 
@@ -136,6 +136,11 @@ def _fallback_pipeline(user_intent: str) -> dict:
     }
 
 
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"}), 200
+
+
 @app.route("/api/intent", methods=["POST", "OPTIONS"])
 def process_intent():
     # CORS pre-flight
@@ -165,8 +170,11 @@ def process_intent():
     return resp
 
 
-# ── local development server (python api/intent.py) ─────────────────────────
+# ── entry point (local dev + Railway/Render production) ─────────────────────
 if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv(ROOT / ".env")
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    # Railway injects PORT at runtime; fall back to 8000 locally
+    port = int(os.getenv("PORT", 8000))
+    debug = os.getenv("FLASK_ENV", "production") == "development"
+    app.run(host="0.0.0.0", port=port, debug=debug)
