@@ -7,7 +7,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy only what the Python backend needs
-COPY api/      ./api/
+COPY backend/  ./backend/
 COPY agents/   ./agents/
 COPY tools/    ./tools/
 COPY config/   ./config/
@@ -15,4 +15,4 @@ COPY config/   ./config/
 # Railway injects $PORT at runtime
 EXPOSE 8000
 
-CMD ["python", "api/intent.py"]
+CMD ["python", "backend/server.py"]

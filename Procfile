@@ -1,1 +1,1 @@
-web: python api/intent.py
+web: python backend/server.py
