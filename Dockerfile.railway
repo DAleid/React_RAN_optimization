@@ -7,10 +7,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy only what the Python backend needs
-COPY backend/  ./backend/
-COPY agents/   ./agents/
-COPY tools/    ./tools/
-COPY config/   ./config/
+COPY backend/   ./backend/
+COPY agents/    ./agents/
+COPY tools/     ./tools/
+COPY config/    ./config/
+COPY simulator/ ./simulator/
 
 # Railway injects $PORT at runtime
 EXPOSE 8000
