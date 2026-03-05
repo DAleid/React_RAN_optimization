@@ -13,6 +13,9 @@ COPY tools/     ./tools/
 COPY config/    ./config/
 COPY simulator/ ./simulator/
 
+# Ensure all project modules (simulator, agents, tools, config) are findable
+ENV PYTHONPATH=/app
+
 # Railway injects $PORT at runtime
 EXPOSE 8000
 
