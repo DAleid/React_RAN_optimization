@@ -3,7 +3,7 @@ Intent Processing API — Flask backend (Railway / Render / local)
 POST /api/intent  →  Runs CrewAI agents to parse and plan 5G network intent
 """
 
-import os, sys, json, re
+import os, sys, json, re, traceback
 from pathlib import Path
 from flask import Flask, request, jsonify
 
@@ -164,7 +164,7 @@ def process_intent():
         # Graceful degradation — still return useful data
         result = _fallback_pipeline(user_intent)
         resp   = jsonify({"success": True, "result": result,
-                          "warning": f"Full pipeline failed, used fallback: {str(e)}"})
+                          "warning": f"Full pipeline failed, used fallback: {str(e)}", "traceback": traceback.format_exc()})
 
     resp.headers["Access-Control-Allow-Origin"] = "*"
     return resp
