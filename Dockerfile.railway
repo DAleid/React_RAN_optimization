@@ -18,6 +18,8 @@ COPY data/      ./data/
 # any subprocesses CrewAI may spawn). A .pth file in site-packages is loaded
 # automatically by Python before any user code runs.
 ENV PYTHONPATH=/app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 RUN python -c "import site; open(site.getsitepackages()[0]+'/app.pth','w').write('/app\n')"
 
 # Railway injects $PORT at runtime

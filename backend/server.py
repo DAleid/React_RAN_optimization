@@ -141,6 +141,27 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 
+@app.route("/debug", methods=["GET"])
+def debug():
+    import os
+    info = {
+        "sys_path": sys.path[:8],
+        "root": str(ROOT),
+        "simulator_dir": os.path.exists("/app/simulator"),
+        "simulator_init": os.path.exists("/app/simulator/__init__.py"),
+        "data_dir": os.path.exists("/app/data"),
+        "csv_exists": os.path.exists("/app/data/6G_HetNet_with_location.csv"),
+        "tools_files": os.listdir("/app/tools") if os.path.exists("/app/tools") else [],
+    }
+    try:
+        import simulator  # noqa
+        info["simulator_importable"] = True
+    except Exception as e:
+        info["simulator_importable"] = False
+        info["simulator_import_error"] = str(e)
+    return jsonify(info), 200
+
+
 @app.route("/api/intent", methods=["POST", "OPTIONS"])
 def process_intent():
     # CORS pre-flight
