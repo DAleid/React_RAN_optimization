@@ -8,23 +8,58 @@ import json
 import re
 import random
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Any, List
 from crewai.tools import tool
 
-# KPI thresholds (inlined to avoid import chain)
+# KPI thresholds
 KPI_THRESHOLDS = {
-    "latency_ms":        {"warning": 50,  "critical": 80},
-    "throughput_mbps":   {"warning": 70,  "critical": 50},
-    "cell_load_percent": {"warning": 75,  "critical": 90},
+    "latency_ms":          {"warning": 50,  "critical": 80},
+    "throughput_mbps":     {"warning": 70,  "critical": 50},
+    "cell_load_percent":   {"warning": 75,  "critical": 90},
     "packet_loss_percent": {"warning": 1.0, "critical": 2.0},
 }
+
+# Load dataset once at module level (pandas is always available)
+_df = None
+_df_index = 0
+
+def _load_dataset():
+    global _df
+    try:
+        import pandas as pd
+        data_path = Path(__file__).parent.parent / "data" / "6G_HetNet_with_location.csv"
+        _df = pd.read_csv(data_path)
+    except Exception:
+        _df = None
+
+_load_dataset()
 
 
 def _get_metrics_impl() -> Dict[str, Any]:
     """
-    Internal implementation: Collects current network performance metrics.
-    Returns realistic mock 5G-Advanced KPI data.
+    Internal implementation: Collects current network performance metrics
+    from the real 6G HetNet dataset. Falls back to random values only if
+    the dataset cannot be read.
     """
+    global _df_index
+    if _df is not None and len(_df) > 0:
+        row = _df.iloc[_df_index % len(_df)]
+        _df_index += 1
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "metrics": {
+                "throughput_mbps":        round(float(row["Achieved_Throughput_Mbps"]), 2),
+                "latency_ms":             round(float(row["Network_Latency_ms"]), 2),
+                "packet_loss_percent":    round(float(row["Packet_Loss_Ratio"]) * 100, 4),
+                "connected_users":        int(row["User_ID"]) % 1000,
+                "cell_load_percent":      round(float(row["Resource_Utilization"]), 2),
+                "active_slices":          random.randint(2, 6),
+                "energy_consumption_kwh": round(float(row["Power_Consumption_Watt"]) * 0.001, 2),
+            },
+            "collection_successful": True,
+        }
+    # Fallback if CSV not available
     return {
         "timestamp": datetime.now().isoformat(),
         "metrics": {

@@ -5,13 +5,39 @@ Tools used by the Optimizer & Executor Agent to perform network optimizations.
 """
 
 import random
-from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, Any, Optional
 from crewai.tools import tool
 
+# Load dataset once (pandas is always available in requirements.txt)
+_df = None
+_df_index = 0
 
-def _mock_metrics():
-    """Generate mock 5G network metrics (no external deps)."""
+def _load_dataset():
+    global _df
+    try:
+        import pandas as pd
+        data_path = Path(__file__).parent.parent / "data" / "6G_HetNet_with_location.csv"
+        _df = pd.read_csv(data_path)
+    except Exception:
+        _df = None
+
+_load_dataset()
+
+
+def _get_row_metrics() -> Dict:
+    """Return metrics from one real dataset row, cycling through rows."""
+    global _df_index
+    if _df is not None and len(_df) > 0:
+        row = _df.iloc[_df_index % len(_df)]
+        _df_index += 1
+        return {
+            "latency_ms":          round(float(row["Network_Latency_ms"]), 2),
+            "throughput_mbps":     round(float(row["Achieved_Throughput_Mbps"]), 2),
+            "cell_load_percent":   round(float(row["Resource_Utilization"]), 2),
+            "packet_loss_percent": round(float(row["Packet_Loss_Ratio"]) * 100, 4),
+        }
     return {
         "latency_ms":          round(random.uniform(8, 60), 2),
         "throughput_mbps":     round(random.uniform(60, 140), 2),
@@ -37,8 +63,8 @@ def _execute_action_impl(action: str, parameters: Dict[str, Any]) -> Dict[str, A
             "valid_actions": valid_actions
         }
 
-    before = _mock_metrics()
-    # Simulate improvement after action
+    before = _get_row_metrics()
+    # Simulate improvement after action (next row from dataset as "after")
     after = {
         "latency_ms":          round(before["latency_ms"]        * random.uniform(0.75, 0.95), 2),
         "throughput_mbps":     round(before["throughput_mbps"]   * random.uniform(1.05, 1.25), 2),

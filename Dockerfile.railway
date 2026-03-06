@@ -12,6 +12,7 @@ COPY agents/    ./agents/
 COPY tools/     ./tools/
 COPY config/    ./config/
 COPY simulator/ ./simulator/
+COPY data/      ./data/
 
 # Ensure all project modules are findable for ALL Python processes (including
 # any subprocesses CrewAI may spawn). A .pth file in site-packages is loaded
