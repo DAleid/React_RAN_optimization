@@ -14,7 +14,6 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from simulator.network_sim import network_simulator
 from config.settings import KPI_THRESHOLDS
 
 
@@ -22,6 +21,7 @@ def _get_metrics_impl() -> Dict[str, Any]:
     """
     Internal implementation: Collects current network performance metrics.
     """
+    from simulator.network_sim import network_simulator  # lazy import
     metrics = network_simulator.get_metrics()
 
     return {

@@ -13,11 +13,11 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from simulator.network_sim import network_simulator
 
 
 def _execute_action_impl(action: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
     """Internal implementation: Executes an optimization action on the 5G-Advanced network."""
+    from simulator.network_sim import network_simulator  # lazy import
     # Validate action type
     valid_actions = [
         "scale_bandwidth",
