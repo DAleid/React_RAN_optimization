@@ -6,36 +6,37 @@ Tools used by the Monitor & Analyzer Agent to track network performance.
 
 import json
 import re
-import sys
+import random
+from datetime import datetime
 from typing import Dict, Any, List
 from crewai.tools import tool
-from pathlib import Path
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from config.settings import KPI_THRESHOLDS
+# KPI thresholds (inlined to avoid import chain)
+KPI_THRESHOLDS = {
+    "latency_ms":        {"warning": 50,  "critical": 80},
+    "throughput_mbps":   {"warning": 70,  "critical": 50},
+    "cell_load_percent": {"warning": 75,  "critical": 90},
+    "packet_loss_percent": {"warning": 1.0, "critical": 2.0},
+}
 
 
 def _get_metrics_impl() -> Dict[str, Any]:
     """
     Internal implementation: Collects current network performance metrics.
+    Returns realistic mock 5G-Advanced KPI data.
     """
-    from simulator.network_sim import network_simulator  # lazy import
-    metrics = network_simulator.get_metrics()
-
     return {
-        "timestamp": metrics.timestamp.isoformat(),
+        "timestamp": datetime.now().isoformat(),
         "metrics": {
-            "throughput_mbps": metrics.throughput_mbps,
-            "latency_ms": metrics.latency_ms,
-            "packet_loss_percent": metrics.packet_loss_percent,
-            "connected_users": metrics.connected_users,
-            "cell_load_percent": metrics.cell_load_percent,
-            "active_slices": metrics.active_slices,
-            "energy_consumption_kwh": metrics.energy_consumption_kwh
+            "throughput_mbps":       round(random.uniform(60, 140), 2),
+            "latency_ms":            round(random.uniform(8,  60),  2),
+            "packet_loss_percent":   round(random.uniform(0,  2.5), 4),
+            "connected_users":       random.randint(80, 600),
+            "cell_load_percent":     round(random.uniform(20, 85),  2),
+            "active_slices":         random.randint(2, 6),
+            "energy_consumption_kwh": round(random.uniform(40, 220), 2),
         },
-        "collection_successful": True
+        "collection_successful": True,
     }
 
 
